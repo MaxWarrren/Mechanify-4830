@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanify — Web Dev II Final Presentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0a0a0a;
+    color: #f1f1f1;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .deck {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    text-align: center;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Slide backgrounds */
+  .slide-title   { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); }
+  .slide-light   { background: #111827; }
+  .slide-feature { background: #0d1b2e; }
+  .slide-tech    { background: #111827; }
+  .slide-close   { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); }
+
+  /* Typography */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #ffffff, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #f1f1f1;
+    margin-bottom: 32px;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(96, 165, 250, 0.15);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    color: #93c5fd;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 4px;
+  }
+
+  /* Cards grid */
+  .cards {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .cards-2 { grid-template-columns: 1fr 1fr; }
+  .cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: left;
+  }
+
+  .card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f1f1f1;
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    line-height: 1.6;
+  }
+
+  /* Stack table */
+  .stack-table {
+    width: 100%;
+    max-width: 720px;
+    border-collapse: collapse;
+  }
+
+  .stack-table tr {
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .stack-table td {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+  }
+
+  .stack-table td:first-child {
+    color: #60a5fa;
+    font-weight: 600;
+    width: 180px;
+  }
+
+  .stack-table td:last-child {
+    color: #e2e8f0;
+  }
+
+  /* Architecture diagram */
+  .arch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+  }
+
+  .arch-box {
+    background: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    border-radius: 10px;
+    padding: 16px 24px;
+    color: #bfdbfe;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .arch-box small {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .arch-arrow {
+    color: #334155;
+    font-size: 1.4rem;
+  }
+
+  /* Challenge list */
+  .challenge-list {
+    list-style: none;
+    max-width: 760px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .challenge-list li {
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid #3b82f6;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 20px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+
+  .challenge-list li strong {
+    color: #93c5fd;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* Team card */
+  .team-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 32px 48px;
+    text-align: center;
+  }
+
+  .team-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 auto 16px;
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(15,23,42,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 10px 20px;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s;
+  }
+
+  .nav button:hover { color: #f1f1f1; }
+
+  .nav-count {
+    font-size: 0.8rem;
+    color: #475569;
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .url {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 0.9rem;
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.25);
+    color: #93c5fd;
+    padding: 8px 20px;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  .highlight { color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1: Title -->
+  <div class="slide slide-title active">
+    <div class="eyebrow">INFOTC 4830 — Web Development II — Spring 2026</div>
+    <h1>Mechanify</h1>
+    <p class="subtitle">An AI-powered mechanic shop management platform for tracking customers, vehicles, repair jobs, and answering technical questions from uploaded PDF manuals.</p>
+    <div>
+      <span class="badge">Angular 21</span>
+      <span class="badge">Node.js + Express</span>
+      <span class="badge">MongoDB Atlas</span>
+      <span class="badge">Google Gemini AI</span>
+    </div>
+  </div>
+
+  <!-- Slide 2: Problem & Solution -->
+  <div class="slide slide-light">
+    <div class="eyebrow">Overview</div>
+    <h2>What Problem Does It Solve?</h2>
+    <div class="cards cards-2" style="max-width:780px">
+      <div class="card">
+        <div class="card-icon">🔧</div>
+        <h3>Shop Operations</h3>
+        <p>Mechanics need a single place to manage customers, track vehicles, and monitor repair job status — without paper or disconnected spreadsheets.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h3>AI Knowledge Access</h3>
+        <p>Technicians can upload vehicle PDFs and ask the AI assistant specific questions, getting answers with page-level citations from the actual manual.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Customer Pipeline</h3>
+        <p>A CRM-style view tracks customers from Lead → Active → Returning — showing open jobs, lifetime revenue, and last service date at a glance.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💬</div>
+        <h3>Persistent Chat Sessions</h3>
+        <p>Chat conversations are saved to MongoDB. Users can switch between sessions and the AI always has the right context without bloating its window.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Tech Stack -->
+  <div class="slide slide-tech">
+    <div class="eyebrow">Tech Stack</div>
+    <h2>Technologies Used</h2>
+    <table class="stack-table">
+      <tr><td>Frontend</td><td>Angular 21 — standalone components, signals, zone.js change detection</td></tr>
+      <tr><td>UI</td><td>Spartan-ng + Tailwind CSS with OKLCH semantic tokens</td></tr>
+      <tr><td>Backend</td><td>Node.js + Express 5 — native http module, MVC architecture</td></tr>
+      <tr><td>Database</td><td>MongoDB Atlas + Mongoose — vector search index on chunks collection</td></tr>
+      <tr><td>AI Chat</td><td>Google Gemini <code>gemini-3.1-flash-lite-preview</code> via SSE streaming</td></tr>
+      <tr><td>Embeddings</td><td>Voyage AI <code>voyage-4-lite</code> (1024-dim) for PDF vectorization</td></tr>
+      <tr><td>Deployment</td><td>Vercel (frontend) + Render (backend)</td></tr>
+    </table>
+  </div>
+
+  <!-- Slide 4: Architecture -->
+  <div class="slide slide-light">
+    <div class="eyebrow">Architecture</div>
+    <h2>System Architecture</h2>
+    <div class="arch">
+      <div class="arch-box">Angular<small>Vercel</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Express API<small>Render</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">MongoDB Atlas<small>Mongoose</small></div>
+    </div>
+    <div style="height:24px"></div>
+    <div class="arch">
+      <div class="arch-box">PDF Upload<small>Multer</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Voyage AI<small>Embeddings</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Vector Index<small>Atlas Search</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box">Gemini Chat<small>SSE Stream</small></div>
+    </div>
+    <p style="color:#475569; font-size:0.8rem; margin-top:32px">Chat uses a bounded 10-message history window to keep the LLM context clean across sessions</p>
+  </div>
+
+  <!-- Slide 5: Features - Core -->
+  <div class="slide slide-feature">
+    <div class="eyebrow">Features</div>
+    <h2>Core Shop Management</h2>
+    <div class="cards cards-3">
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <h3>Customer CRM</h3>
+        <p>Pipeline status, search + filter, lifetime revenue, vehicle count, last service date. Inline status updates.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚗</div>
+        <h3>Vehicles</h3>
+        <p>Full CRUD — make, model, year, VIN, mileage. Owner lookup, open job count, last service date. Detail view with full job history.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛠️</div>
+        <h3>Repair Jobs</h3>
+        <p>Status tracking (Pending / In-Progress / Completed), estimated vs actual cost. Metric tiles for counts per status.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Features - AI -->
+  <div class="slide slide-feature">
+    <div class="eyebrow">Features</div>
+    <h2>AI Chat + Knowledge Base</h2>
+    <div class="cards cards-2" style="max-width:780px">
+      <div class="card">
+        <div class="card-icon">📄</div>
+        <h3>PDF Knowledge Base</h3>
+        <p>Upload vehicle manuals. Each page is chunked, embedded with Voyage AI, and stored as vectors in MongoDB Atlas for semantic search.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h3>RAG Pipeline</h3>
+        <p>User selects a manual before chatting. Top relevant chunks are retrieved via vector search and injected into the Gemini prompt as context.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📖</div>
+        <h3>Page Citations</h3>
+        <p>The AI references exact page numbers from the manual in its answers. Responses render full markdown formatting.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💾</div>
+        <h3>Multi-Session Memory</h3>
+        <p>Conversations persist in MongoDB. Each session stores its full message history. LLM receives only the last 10 messages to keep context lean.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Technical Challenges -->
+  <div class="slide slide-light">
+    <div class="eyebrow">Engineering</div>
+    <h2>Key Technical Challenges</h2>
+    <ul class="challenge-list">
+      <li>
+        <strong>Angular 21 Zoneless Default</strong>
+        Angular 21 defaults to zoneless change detection — HTTP subscribe callbacks weren't triggering re-renders. Fixed with one line: <code>provideZoneChangeDetection()</code> in app.config.ts.
+      </li>
+      <li>
+        <strong>Embedding Rate Limits → Voyage AI</strong>
+        Gemini Embedding 2 hit TPM limits during development. Switched to Voyage AI (<code>voyage-4-lite</code>, 1024-dim, 200M free tokens) with a custom REST integration.
+      </li>
+      <li>
+        <strong>pdf-parse v2 API Break</strong>
+        The library changed from a function export to a class in v2. Required rewriting the upload controller to use <code>new PDFParse()</code> and page-level text extraction.
+      </li>
+      <li>
+        <strong>SSE Streaming + Session Persistence</strong>
+        Streaming Gemini responses via SSE while buffering the full reply to persist to MongoDB at stream end — without blocking the client.
+      </li>
+    </ul>
+  </div>
+
+  <!-- Slide 8: Deployment -->
+  <div class="slide slide-feature">
+    <div class="eyebrow">Deployment</div>
+    <h2>Live & Deployed</h2>
+    <div class="cards cards-2" style="max-width:680px; margin-bottom:32px">
+      <div class="card" style="text-align:center">
+        <div class="card-icon">▲</div>
+        <h3>Frontend — Vercel</h3>
+        <p>Angular build, SPA rewrites, auto-deploys on push to main</p>
+        <div class="url">mechanify-4830-fp.vercel.app</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="card-icon">⬡</div>
+        <h3>Backend — Render</h3>
+        <p>Node.js service, env vars configured, auto-deploys on push</p>
+        <div class="url">mechanify-backend.onrender.com</div>
+      </div>
+    </div>
+    <p style="color:#475569; font-size:0.85rem">CORS locked to Vercel origin · MongoDB Atlas hosted in AWS us-east · Deployed via Claude Code MCP integrations</p>
+  </div>
+
+  <!-- Slide 9: Team -->
+  <div class="slide slide-light">
+    <div class="eyebrow">Team</div>
+    <h2>Developer</h2>
+    <div class="team-card">
+      <div class="team-avatar">MW</div>
+      <h3 style="font-size:1.4rem; margin-bottom:8px">Maxwell Warren</h3>
+      <p style="color:#94a3b8; margin-bottom:16px">Full Stack Developer</p>
+      <p style="color:#64748b; font-size:0.9rem; max-width:420px; margin:0 auto">
+        Designed and built the complete application — Angular frontend, Express backend, MongoDB schema, Voyage AI embedding pipeline, Gemini chat integration, and cloud deployment to Vercel and Render.
+      </p>
+    </div>
+  </div>
+
+  <!-- Slide 10: Close -->
+  <div class="slide slide-close">
+    <div class="eyebrow">INFOTC 4830 — Spring 2026</div>
+    <h1>Mechanify</h1>
+    <p class="subtitle">Thank you. Live demo at:</p>
+    <div class="url" style="font-size:1.1rem">mechanify-4830-fp.vercel.app</div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prev()">←</button>
+  <span class="nav-count" id="count">1 / 10</span>
+  <button onclick="next()">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function show(n) {
+    slides[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    document.getElementById('count').textContent = `${current + 1} / ${slides.length}`;
+  }
+
+  function next() { show(current + 1); }
+  function prev() { show(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+</script>
+
+</body>
+</html>
