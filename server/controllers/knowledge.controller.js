@@ -135,9 +135,13 @@ exports.deleteManual = async (req, res) => {
 };
 
 exports.searchChunks = async (query, { limit = 5, manualIds = null } = {}) => {
-  if (!query || !process.env.VOYAGE_API_KEY) return [];
+  if (!query || !process.env.VOYAGE_API_KEY) {
+    console.warn('[searchChunks] Skipping — query or VOYAGE_API_KEY missing');
+    return [];
+  }
   try {
     const [vector] = await voyageEmbed([query], 'query');
+    console.log(`[searchChunks] Generated query vector of length ${vector.length} for: "${query.slice(0, 80)}"`);
     const stage = {
       index: 'manual_chunks_vector_index',
       path: 'embedding',
@@ -150,13 +154,16 @@ exports.searchChunks = async (query, { limit = 5, manualIds = null } = {}) => {
       stage.filter = {
         manualId: { $in: manualIds.map(id => new mongoose.Types.ObjectId(id)) }
       };
+      console.log(`[searchChunks] Filtering by manualIds: ${manualIds.join(', ')}`);
     }
-    return await ManualChunk.aggregate([
+    const results = await ManualChunk.aggregate([
       { $vectorSearch: stage },
       { $project: { text: 1, manualId: 1, page: 1, score: { $meta: 'vectorSearchScore' } } }
     ]);
+    console.log(`[searchChunks] Retrieved ${results.length} chunks. Top score: ${results[0]?.score ?? 'n/a'}`);
+    return results;
   } catch (err) {
-    console.warn('Vector search unavailable, falling back to no retrieval:', err.message);
+    console.error('[searchChunks] FAILED:', err.message, err.stack);
     return [];
   }
 };
